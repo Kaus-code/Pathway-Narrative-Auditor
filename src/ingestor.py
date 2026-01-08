@@ -41,9 +41,7 @@ class DataIngestor:
         # Decode binary data to text (assuming UTF-8)
         # We handle potential decoding errors gracefully or just assume clean input for now
         documents = files.select(
-            text=pw.this.data,
-            path=pw.this.path,
-            modified_at=pw.this.modified_at
+            data=pw.this.data
         )
         
         # Filter out non-text files if necessary, or just keep all
@@ -65,8 +63,11 @@ class DataIngestor:
         # unless we expect the CSV to grow. The existing code passes watch_mode to constructor.
         # Let's assume the CSV might update or just use the same mode policy.
         
+        class BackstorySchema(pw.Schema):
+            backstory: str
+
         return pw.io.csv.read(
             csv_path,
             mode="streaming" if self.watch_mode else "static",
-            schema=None  # Infer schema automatically
+            schema=BackstorySchema
         )

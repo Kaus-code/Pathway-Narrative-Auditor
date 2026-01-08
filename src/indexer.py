@@ -30,10 +30,15 @@ class HybridIndexer:
         Returns:
             pw.Table: An indexed table ready for ANN search.
         """
+        # Create the embedder instance
+        embedder = llm.embedders.LiteLLMEmbedder(
+            model=self.embedder_config.get("model", "gemini/text-embedding-004"),
+            api_key=self.embedder_config.get("api_key")
+        )
+
         # Create a vector store using Pathway's LLM XPack
-        # This automatically handles splitting, embedding, and indexing
-        return llm.vector_store(
+        # Using VectorStoreServer class from the module
+        return llm.vector_store.VectorStoreServer(
             table,
-            embedder=self.embedder_config,
-            # We can rely on default splitter or customize if needed
+            embedder=embedder,
         )

@@ -27,12 +27,12 @@ class BackstoryAnalyzer:
                                Defaults to using 'gemini-1.5-pro' compatible settings.
         """
         self.llm_config = llm_config or {}
-        self.model_name = self.llm_config.get("model", "gemini/gemini-1.5-pro-latest")
+        self.model_name = self.llm_config.get("model", "gemini/gemini-flash-latest")
         # Prefer specific key in config, else check common env vars, else let litellm handle it
         self.api_key = self.llm_config.get("api_key") 
         if not self.api_key:
-             # Fallback check for Gemini/OpenAI/XAI for convenience, though Litellm does this too
-             self.api_key = os.getenv("GEMINI_API_KEY") or os.getenv("XAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+             # Fallback check for Gemini/OpenAI/XAI for convenience
+             self.api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("OPENAI_API_KEY")
 
     async def extract_atomic_claims(self, backstory: str) -> List[str]:
         """
