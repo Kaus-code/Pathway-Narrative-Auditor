@@ -1,3 +1,6 @@
+character_name,backstory
+Alice,Alice was a cryptographer who loved solving puzzles. She grew up in Bletchley Park.
+Bob,Bob was a network engineer obsessed with latency. He once optimized a toaster.
 id,book_name,char,caption,content
 95,The Count of Monte Cristo,Noirtier,The Fatal Decision of the Hundred Days,"Learning that Villefort meant to denounce him to Louis XVIII, Noirtier pre-emptively handed the conspiracy dossier to a British spy—the very file the Count of Monte Cristo later acquired—thereby engineering his son’s “lawful” murder."
 136,The Count of Monte Cristo,Faria,Escape and Secret Life,"From 1800 onward he lived quietly on a small island, drafting a vast work on human intelligence while sending chapters out by secret courier."
