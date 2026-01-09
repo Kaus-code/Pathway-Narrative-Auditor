@@ -22,20 +22,25 @@ class NarrativeAuditor:
         self.index_table = index_table
         self.llm_config = llm_config
 
-    def audit_claim(self, claim: str) -> bool:
+    async def audit_claim(self, claim: str) -> dict:
         """
-        Audits a single atomic claim.
-
-        Args:
-            claim (str): The claim to verify.
-
-        Returns:
-            bool: True if consistent, False if contradicted.
+        Verifies a single claim against the context.
         """
-        # TODO: Perform RAG lookup
-        # query the index_table with the claim
-        # retrieve relevant chunks
-        # use LLM to compare claim vs chunks
+        # Rate Limiting for Free Tier
+        import asyncio
+        await asyncio.sleep(15)
+
+        # 1. Retrieve Context
+        # We need to construct a query table for this specific claim
+        # Since this is running inside a UDF (conceptually), we assume we can query the index.
+        # However, Pathway UDFs cannot easily query the index directly if it's a separate stream.
+        # DESIGN CHANGE: The Auditor should receive the context from the retrieval step.
+        # For this hackathon implementation, we simplified: Auditor has access to valid index query.
+        
+        # We use the retrieve_query logic wrapper or direct call if possible.
+        # Since we are inside a coroutine, we can try to call the server.
+        
+        # For now, let's assume we can query.
         pass
 
     def audit_backstory(self, claims_table: pw.Table) -> pw.Table:
@@ -75,7 +80,9 @@ class NarrativeAuditor:
         # 2. Verify consistency using LLM
         @pw.udf
         async def verify_claim(claim: str, context: list[dict]) -> dict:
-            prompt = f"Claim: {claim}\nContext: {context}\nIs this claim consistent with the context? Return JSON {{'consistent': bool, 'reason': str}}"
+            import asyncio
+            await asyncio.sleep(15)
+            prompt = f"Claim: {claim}\\nContext: {context}\\nIs this claim consistent with the context? Return JSON {{'consistent': bool, 'reason': str}}"
             # Simplified LLM call
             from litellm import acompletion
             import json

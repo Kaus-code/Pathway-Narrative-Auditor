@@ -59,10 +59,50 @@ class BackstoryAnalyzer:
         
         return validated_claims
 
+    async def decompose_backstory(self, text: str) -> list[str]:
+        """
+        Decomposes a backstory into atomic claims.
+        """
+        # Rate Limiting for Free Tier
+        await asyncio.sleep(15)
+
+        prompt = f"""
+        Decompose the following backstory into a list of atomic, verifiable claims.
+        Return ONLY a JSON list of strings.
+        
+        Backstory:
+        "{text}"
+        
+        Rules:
+        1. Each fact must be a single standalone sentence.
+        2. Preserve ALL specific details: Dates, Names, Locations, Relationships.
+        3. Do not summarize; decompose.
+        4. "The library burned in 1995" -> "The library burned." AND "The fire occurred in 1995." (Better: "The library burned in 1995" is atomic enough if verified together, but split complex compound sentences).
+        5. Output strictly valid JSON matching the schema: {{ "facts": [ {{ "fact": "..." }}, ... ] }}
+        """
+        try:
+            response = await acompletion(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                api_key=self.api_key
+            )
+            
+            content = response.choices[0].message.content
+            parsed = ExtractionResponse.model_validate_json(content)
+            return [item.fact for item in parsed.facts]
+        except Exception as e:
+            print(f"Decomposition error: {e}")
+            return [text]
+
     async def _decompose_text(self, text: str) -> List[str]:
         """
         Internal method to perform the initial decomposition.
         """
+        # Rate Limit
+        import asyncio
+        await asyncio.sleep(15)
+
         prompt = f"""
         You are an expert Forensic Narrative Analyst.
         Target: Break the following text into a list of ATOMIC, VERIFIABLE facts.

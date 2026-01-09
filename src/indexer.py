@@ -36,9 +36,14 @@ class HybridIndexer:
             api_key=self.embedder_config.get("api_key")
         )
 
+        # Create a parser with defaults (smart chunking via unstructured)
+        # To further minimize rows, we could explore mode="single" but let's stick to standard smart parsing
+        parser = llm.parsers.ParseUnstructured()
+
         # Create a vector store using Pathway's LLM XPack
         # Using VectorStoreServer class from the module
         return llm.vector_store.VectorStoreServer(
             table,
             embedder=embedder,
+            parser=parser,
         )

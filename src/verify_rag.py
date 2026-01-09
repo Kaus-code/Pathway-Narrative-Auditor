@@ -17,6 +17,8 @@ def verify():
     books_table = ingestor.ingest_books()
     
     # 2. Index
+    print("Inspecting books table...")
+    pw.debug.compute_and_print(books_table)
     print("Building index...")
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     # text-embedding-004 works
@@ -33,7 +35,7 @@ def verify():
         {
             "query": "What is the story about?",
             "k": 3,
-            "filepath_globpattern": "*",
+            "filepath_globpattern": None,
             "metadata_filter": None
         }
     ])
@@ -41,6 +43,7 @@ def verify():
     
     print("Running retrieval...")
     # We must use retrieve_query if available
+
     try:
         results = index.retrieve_query(query_table)
         print("Computing and printing results...")

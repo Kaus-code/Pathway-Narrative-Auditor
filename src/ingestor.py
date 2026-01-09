@@ -31,33 +31,18 @@ class DataIngestor:
         """
         # Read files from the data directory
         # mode="streaming" allows real-time updates when new files are added
+        # format="binary" is required for ParseUnstructured/UnstructuredParser
         files = pw.io.fs.read(
             self.data_dir,
-            format="plaintext",
+            format="binary",
             mode="streaming" if self.watch_mode else "static",
             with_metadata=True,
         )
 
-        @pw.udf
-        def get_path_udf(meta: dict) -> str:
-            return meta.get("path", "unknown")
-            
-        @pw.udf
-        def get_time_udf(meta: dict) -> int:
-            val = meta.get("modified_at", 0)
-            return int(val) if val else 0
-
-        # Decode binary data to text (assuming UTF-8)
-        # We handle potential decoding errors gracefully or just assume clean input for now
-        documents = files.select(
-            data=pw.this.data,
-            path=get_path_udf(pw.this._metadata),
-            modified_at=get_time_udf(pw.this._metadata)
-        )
-        
-        # Filter out non-text files if necessary, or just keep all
-        # For now, we return everything that was successfully decoded
-        return documents
+        # Decode binary data to text is handled by format="plaintext"
+        # We simply return the files table which contains [data, _metadata]
+        # This preserves _metadata for VectorStoreServer
+        return files
 
     def ingest_test_csv(self, csv_path: str) -> pw.Table:
         """

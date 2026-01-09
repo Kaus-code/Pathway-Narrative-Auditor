@@ -24,8 +24,8 @@ def main():
     5. Save Results
     """
     # 1. Configuration
-    DATA_DIR = "./data/"
-    TEST_CSV = "./data/test.csv"
+    DATA_DIR = "./data/mini/"
+    TEST_CSV = "./data/test_mini.csv"
 
     # 2. Ingestion
     ingestor = DataIngestor(DATA_DIR)
