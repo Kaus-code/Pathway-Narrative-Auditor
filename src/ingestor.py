@@ -31,24 +31,18 @@ class DataIngestor:
         """
         # Read files from the data directory
         # mode="streaming" allows real-time updates when new files are added
+        # format="binary" is required for ParseUnstructured/UnstructuredParser
         files = pw.io.fs.read(
             self.data_dir,
-            format="plaintext",
+            format="binary",
             mode="streaming" if self.watch_mode else "static",
             with_metadata=True,
         )
 
-        # Decode binary data to text (assuming UTF-8)
-        # We handle potential decoding errors gracefully or just assume clean input for now
-        documents = files.select(
-            text=pw.this.data,
-            path=pw.this.path,
-            modified_at=pw.this.modified_at
-        )
-        
-        # Filter out non-text files if necessary, or just keep all
-        # For now, we return everything that was successfully decoded
-        return documents
+        # Decode binary data to text is handled by format="plaintext"
+        # We simply return the files table which contains [data, _metadata]
+        # This preserves _metadata for VectorStoreServer
+        return files
 
     def ingest_test_csv(self, csv_path: str) -> pw.Table:
         """
@@ -65,8 +59,11 @@ class DataIngestor:
         # unless we expect the CSV to grow. The existing code passes watch_mode to constructor.
         # Let's assume the CSV might update or just use the same mode policy.
         
+        class BackstorySchema(pw.Schema):
+            backstory: str
+
         return pw.io.csv.read(
             csv_path,
             mode="streaming" if self.watch_mode else "static",
-            schema=None  # Infer schema automatically
+            schema=BackstorySchema
         )
